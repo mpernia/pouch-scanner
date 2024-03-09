@@ -38,7 +38,7 @@ class RollDto implements Roll
         return $this->pouches;
     }
 
-    public function setPouches(?PouchCollection $pouches): static
+    public function setPouches(?PouchCollection $pouches): Roll
     {
         $this->pouches = $pouches;
         return $this;
@@ -49,7 +49,7 @@ class RollDto implements Roll
         return $this->status;
     }
 
-    public function setStatus(string $status): static
+    public function setStatus(string $status): Roll
     {
         $this->status = $status;
         return $this;

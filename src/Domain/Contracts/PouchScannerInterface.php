@@ -13,7 +13,9 @@ interface PouchScannerInterface
      * @return void
      */
     public function configure(?Connection $connection = null, ?StorageSetting $storage = null): PouchScannerInterface;
+
     public function login(): PouchScannerInterface;
+    
     public function getNotInspectedRolls(int $daysBack = 1);
 
     public function getInProgressRolls(int $daysBack = 1);
