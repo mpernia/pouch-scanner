@@ -1,6 +1,7 @@
 {
     "name": "mpernia/pouch-scanner",
     "description": "Pouch Scanner",
+    "version": "1.0.2",
     "type": "php",
     "license": "MIT",
     "keywords": ["laravel","Pouch Scanner", "json","http", "request", "response"],
