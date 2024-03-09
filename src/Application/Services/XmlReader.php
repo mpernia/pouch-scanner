@@ -6,23 +6,31 @@ use Exception;
 use PouchScanner\Domain\Contracts\PouchCollection;
 use PouchScanner\Domain\Exceptions\FailedOpenFileException;
 use PouchScanner\Domain\Exceptions\InvalidFileFormatException;
+use PouchScanner\Domain\Exceptions\FailedActionException;
 
 class XmlReader
 {
-    protected array $xmlArrayContent;
+    protected array $xmlArrayContent = [];
 
     public function read(string $xmlContent): array
     {
+        if (!$this->validateXmlFormat($xmlContent)) {
+            throw new InvalidFileFormatException;
+        }
         try {
             $xmlContent = $this->stripTags($xmlContent);
             $xmlContent = simplexml_load_string($xmlContent);
         } catch (Exception $exception) {
             throw new InvalidFileFormatException;
         }
-        $this->xmlArrayContent = json_decode(
-            json: json_encode($xmlContent),
-            associative: true
-        );
+        try {
+            $this->xmlArrayContent = json_decode(
+                json: json_encode($xmlContent),
+                associative: true
+            );
+        } catch (Exception $exception) {
+            throw new FailedActionException($exception->getMessage());
+        }
         return $this->xmlArrayContent;
     }
 
@@ -40,16 +48,13 @@ class XmlReader
         );
     }
 
-    public function attributes(): object
+    protected function validateXmlFormat(?string $xmlContent): bool
     {
-        return (object)$this->xmlArrayContent['pouches']['@attributes'];
-    }
-    public function pouches(): array
-    {
-        $pouches = [];
-        foreach ($this->xmlArrayContent['pouches']['pouch'] as $pouche) {
-            $pouches[] = (object)$pouche;
-        }
-        return $pouches;
+        if (!$xmlContent) { return false; }
+        libxml_use_internal_errors(true);
+        simplexml_load_string($xmlContent);
+        $errors = libxml_get_errors();
+        libxml_clear_errors();
+        return empty($errors);
     }
 }

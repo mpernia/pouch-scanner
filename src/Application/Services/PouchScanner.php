@@ -13,11 +13,20 @@ use PouchScanner\Domain\Contracts\PouchCollection;
 use PouchScanner\Domain\Contracts\PouchScannerInterface;
 use PouchScanner\Domain\Contracts\Roll;
 use PouchScanner\Domain\Contracts\RollCollection;
+use PouchScanner\Domain\Exceptions\InvalidResponseException;
+use PouchScanner\Domain\Exceptions\FailedSaveFileException;
+use PouchScanner\Domain\RollStatus;
 use PouchScanner\Domain\StorageSetting;
+//use GuzzleHttp\Psr7;
 use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Request;/*
+use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\ConnectException;*/
 use SimpleXMLElement;
 
+/**
+ * This class implements lorem ipsum
+ */
 class PouchScanner implements PouchScannerInterface
 {
     private const PAYLOAD = '<?xml version="1.0" encoding="UTF-8"?><Content><Username>%s</Username><Password>%s</Password></Content>';
@@ -74,21 +83,30 @@ class PouchScanner implements PouchScannerInterface
     {
         $response = $this->sendRequest("Data/Export/GetNotInspectedRolls/{$daysBack}");
         $this->saveRequestIfConfigured($response);
-        return $this->rollCreator->__invoke($this->xmlReader->read($response));
+        return $this->rollCreator->__invoke(
+            data: $this->xmlReader->read($response),
+            status: RollStatus::NOT_INSPECTED
+        );
     }
 
     public function getInProgressRolls(int $daysBack = 1): RollCollection
     {
         $response = $this->sendRequest("Data/Export/GetInProgressRolls/{$daysBack}");
         $this->saveRequestIfConfigured($response);
-        return $this->rollCreator->__invoke($this->xmlReader->read($response));
+        return $this->rollCreator->__invoke(
+            data: $this->xmlReader->read($response),
+            status: RollStatus::IN_PROGRESS
+        );
     }
 
     public function getFinalizedRolls(int $daysBack = 1): RollCollection
     {
         $response = $this->sendRequest("Data/Export/GetFinalizedRolls/{$daysBack}");
         $this->saveRequestIfConfigured($response);
-        return $this->rollCreator->__invoke($this->xmlReader->read($response));
+        return $this->rollCreator->__invoke(
+            data: $this->xmlReader->read($response),
+            status: RollStatus::FINALIZED
+        );
     }
 
     public function getRoll(int|string $rollId): Roll
@@ -101,7 +119,8 @@ class PouchScanner implements PouchScannerInterface
             patientRoll: $rollId,
             batchId: $attributes->batchId,
             patientId: $attributes->patientId,
-            pouches: $this->pouchCreator->__invoke($arrayContent)
+            pouches: $this->pouchCreator->__invoke($arrayContent),
+            status: RollStatus::FINALIZED->value
         );
         return $roll->setPouches(
             $this->saveImageIfConfigured($roll->getPouches())
@@ -111,13 +130,15 @@ class PouchScanner implements PouchScannerInterface
     private function saveRequestIfConfigured(string $request):void
     {
         if ($this->storage->isStorageRequest()) {
+            $filename = sprintf(
+                '%s/request-%s.xml',
+                $this->storage->getStorageDirectory(),
+                date('Y-m-d_H-i-s')
+            );
             try {
-                Storage::disk($this->storage->getStorageDisk())->put(
-                    sprintf('%s/request-%s.xml', $this->storage->getStorageDirectory(), date('Y-m-d_H-i-s')),
-                    $request
-                );
-            } catch (Exception $e) {
-                //
+                Storage::disk($this->storage->getStorageDisk())->put($filename, $request);
+            } catch (Exception $exception) {
+                throw new FailedSaveFileException($filename);
             }
         }
     }
@@ -148,17 +169,16 @@ class PouchScanner implements PouchScannerInterface
     }
 
     /** @throws GuzzleException */
-    private function sendRequest(string $uri, ?string $method = null, string $body = ''): ?string
+    private function sendRequest(string $uri, ?string $method = null, string $body = ''): string
     {
         $method = is_null($method) ? config('pouch-scanner.http.verb') : $method;
         $request = new Request($method, $this->url($uri), $this->headers, $body);
         try {
             $res = $this->client->sendAsync($request, $this->options())->wait();
             return $res->getBody();
-        } catch (Exception $e) {
-            //
+        } catch (Exception $exception) {
+            throw new InvalidResponseException($exception->getMessage());
         }
-        return null;
     }
 
     private function url($uri = ''): string

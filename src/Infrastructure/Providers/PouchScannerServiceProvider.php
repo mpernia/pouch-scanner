@@ -14,31 +14,31 @@ class PouchScannerServiceProvider extends ServiceProvider
         $this->app->singleton('PouchScanner', function () {
             return new PouchScanner;
         });
-        $this->app->bind(Contracts\PouchScannerInterface::class, function () {
+        $this->app->bind(Contracts\PouchScannerInterface::class, function () : PouchScanner {
             return new PouchScanner;
         });
-        $this->app->bind(Contracts\RollCollection::class, function () {
+        $this->app->bind(Contracts\RollCollection::class, function () : RollCollectionDto {
             return new DataTransferObjects\RollCollectionDto;
         });
-        $this->app->bind(Contracts\PouchCollection::class, function () {
+        $this->app->bind(Contracts\PouchCollection::class, function () : PouchCollectionDto {
             return new DataTransferObjects\PouchCollectionDto;
         });
-        $this->app->bind(Contracts\RepairCollection::class, function () {
+        $this->app->bind(Contracts\RepairCollection::class, function () : RepairCollectionDto {
             return new DataTransferObjects\RepairCollectionDto;
         });
-        $this->app->bind(Contracts\PillCollection::class, function () {
+        $this->app->bind(Contracts\PillCollection::class, function () : PillCollectionDto {
             return new DataTransferObjects\PillCollectionDto;
         });
-        $this->app->bind(Contracts\Roll::class, function () {
+        $this->app->bind(Contracts\Roll::class, function () : RollDto {
             return new DataTransferObjects\RollDto;
         });
-        $this->app->bind(Contracts\Pouch::class, function () {
+        $this->app->bind(Contracts\Pouch::class, function () : PouchDto {
             return new DataTransferObjects\PouchDto;
         });
-        $this->app->bind(Contracts\Repair::class, function () {
+        $this->app->bind(Contracts\Repair::class, function () : RepairDto {
             return new DataTransferObjects\RepairDto;
         });
-        $this->app->bind(Contracts\Pill::class, function () {
+        $this->app->bind(Contracts\Pill::class, function () : PillDto {
             return new DataTransferObjects\PillDto;
         });
     }

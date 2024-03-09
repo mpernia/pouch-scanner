@@ -16,7 +16,7 @@ use PouchScanner\Domain\Contracts\RepairCollection;
 class PouchCreator
 {
     public function __invoke(array $data): PouchCollection
-    { //dd($data);
+    {
         $pouches = $data['pouches']['pouch'];
         $puchCollection = new PouchCollectionDto();
         foreach ($pouches as $pouch) {
@@ -63,7 +63,7 @@ class PouchCreator
     }
 
     private function getPillCollection(array $data): PillCollection
-    {//dd($data);
+    {
         $pillCollection = new PillCollectionDto;
         foreach ($data as $pill) {
             $pillCollection->push(
