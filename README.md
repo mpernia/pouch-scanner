@@ -71,5 +71,5 @@ The following commands lists and describes each of:
 
 ## Demo
 
-[Pouch Scanner Demo](https://github.com/mpernia/demo-pouch-scanner/blob/main/docs/README.md)
+[Pouch Scanner Demo](https://github.com/mpernia/demo-pouch-scanner/)
 
