@@ -8,10 +8,22 @@ use PouchScanner\Domain\Exceptions\FailedOpenFileException;
 use PouchScanner\Domain\Exceptions\InvalidFileFormatException;
 use PouchScanner\Domain\Exceptions\FailedActionException;
 
+/**
+ * Use tis class to read the response of the server in XML format
+ */
 class XmlReader
 {
+    /**
+     * @var array
+     */
     protected array $xmlArrayContent = [];
 
+    /**
+     * @param string $xmlContent
+     * @return array
+     * @throws FailedActionException
+     * @throws InvalidFileFormatException
+     */
     public function read(string $xmlContent): array
     {
         if (!$this->validateXmlFormat($xmlContent)) {
@@ -34,11 +46,18 @@ class XmlReader
         return $this->xmlArrayContent;
     }
 
+    /**
+     * @return array
+     */
     public function getContent(): array
     {
         return $this->xmlArrayContent;
     }
 
+    /**
+     * @param string $content
+     * @return string
+     */
     protected function stripTags(string $content): string
     {
         return preg_replace_callback(
@@ -48,6 +67,10 @@ class XmlReader
         );
     }
 
+    /**
+     * @param string|null $xmlContent
+     * @return bool
+     */
     protected function validateXmlFormat(?string $xmlContent): bool
     {
         if (!$xmlContent) { return false; }

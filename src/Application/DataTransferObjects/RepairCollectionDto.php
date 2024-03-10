@@ -4,6 +4,7 @@ namespace PouchScanner\Application\DataTransferObjects;
 
 use PouchScanner\Domain\Contracts\Repair;
 use PouchScanner\Domain\Contracts\RepairCollection;
+use PouchScanner\Domain\Exceptions\InvalidInstanceOfCollectionException;
 use Illuminate\Support\Collection;
 
 class RepairCollectionDto extends Collection implements RepairCollection
@@ -24,7 +25,7 @@ class RepairCollectionDto extends Collection implements RepairCollection
     {
         foreach ($repairs as $repair) {
             if (!$repair instanceof Repair) {
-                throw new \InvalidArgumentException('Only instances of Pouch can be added to RepairCollection.');
+                throw new InvalidInstanceOfCollectionException('Only instances of Pouch can be added to RepairCollection.');
             }
             parent::push($repair);
         }

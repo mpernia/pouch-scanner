@@ -9,20 +9,42 @@ use PouchScanner\Application\DataTransferObjects\PouchCollectionDto;
 use PouchScanner\Application\DataTransferObjects\PouchDto;
 use PouchScanner\Application\DataTransferObjects\RepairCollectionDto;
 use PouchScanner\Application\DataTransferObjects\RepairDto;
+use PouchScanner\Infrastructure\Facades\PouchScanner;
 use PouchScanner\Domain\Contracts\PillCollection;
 use PouchScanner\Domain\Contracts\PouchCollection;
 use PouchScanner\Domain\Contracts\RepairCollection;
 
+/**
+ * Use this class to create a collection of Pouches.
+ * The structure of the one Pouch is:
+ * @property  string|null $pouchId
+ * @property bool $secondValidation
+ * @property string|null $secondValidationBy
+ * @property string|null $checkedBy
+ * @property DateTime|null $checkedDateTime
+ * @property string|null $pouchImageUrl
+ * @property string|null $productionBox
+ * @property DateTime|null $doseTime
+ * @property string|null $visionState
+ * @property string|null $visionMessage
+ * @property RepairCollection|null $repairs
+ * @property PillCollection|null $pills 
+ */
 class PouchCreator
 {
+    /**
+     * @param array $data
+     * @return PouchCollection
+     * @throws \Exception
+     */
     public function __invoke(array $data): PouchCollection
     {
         $pouches = $data['pouches']['pouch'];
-        $puchCollection = new PouchCollectionDto();
+        $puchCollection = PouchScanner::pouchCollection();
         foreach ($pouches as $pouch) {
             $repairs = count($pouch['repairs']) > 0 ? $this->getRepairCollection($pouch['repairs']) : null;
             $pills = count($pouch['pills']) > 0 ? $this->getPillCollection($pouch['pills']) : null;
-            $pouchDto = new PouchDto(
+            $pouchDto = PouchScanner::pouch(
                 pouchId: $pouch['pouchId'],
                 secondValidation: $pouch['secondValidation'],
                 secondValidationBy:$pouch['secondValidationBy'],
@@ -41,17 +63,26 @@ class PouchCreator
         return $puchCollection;
     }
 
+    /**
+     * @param array $data
+     * @return object
+     */
     public function attributes(array $data): object
     {
         return (object)$data['pouches']['@attributes'];
     }
 
+    /**
+     * @param array $data
+     * @return RepairCollection
+     * @throws \Exception
+     */
     private function getRepairCollection(array $data): RepairCollection
     {
-        $repairCollection = new RepairCollectionDto;
+        $repairCollection = PouchScanner::repairCollection();
         foreach ($data as $repair) {
             $repairCollection->push(
-                new RepairDto(
+                PouchScanner::repair(
                     comment: $data['repair']['comment'],
                     repair: $data['repair']['repair'],
                     user: $data['repair']['user'],
@@ -62,12 +93,16 @@ class PouchCreator
         return $repairCollection;
     }
 
+    /**
+     * @param array $data
+     * @return PillCollection
+     */
     private function getPillCollection(array $data): PillCollection
     {
-        $pillCollection = new PillCollectionDto;
+        $pillCollection = PouchScanner::pillCollection();
         foreach ($data as $pill) {
             $pillCollection->push(
-                new PillDto(
+                PouchScanner::pill(
                     medicationId: $pill['medicationId'],
                     amount: (int)$pill['amount'],
                     description: $pill['description'],

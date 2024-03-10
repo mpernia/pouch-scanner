@@ -4,6 +4,7 @@ namespace PouchScanner\Application\DataTransferObjects;
 
 use PouchScanner\Domain\Contracts\Pouch;
 use PouchScanner\Domain\Contracts\PouchCollection;
+use PouchScanner\Domain\Exceptions\InvalidInstanceOfCollectionException;
 use Illuminate\Support\Collection;
 
 class PouchCollectionDto extends Collection implements PouchCollection
@@ -23,33 +24,54 @@ class PouchCollectionDto extends Collection implements PouchCollection
         parent::__construct($items);
     }
 
+    /**
+     * @return string|null
+     */
     public function getPatientRollId(): ?string
     {
         return $this->patientRollId ?? null;
     }
 
+    /**
+     * @param string|null $patientRollId
+     * @return PouchCollection
+     */
     public function setPatientRollId(?string $patientRollId): PouchCollection
     {
         $this->patientRollId = $patientRollId;
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getBatchId(): ?string
     {
         return $this->batchId ?? null;
     }
 
+    /**
+     * @param string $batchId
+     * @return PouchCollection
+     */
     public function setBatchId(string $batchId): PouchCollection
     {
         $this->batchId = $batchId;
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getPatientId(): ?string
     {
         return $this->patientId ?? null;
     }
 
+    /**
+     * @param string $patientId
+     * @return PouchCollection
+     */
     public function setPatientId(string $patientId): PouchCollection
     {
         $this->patientId = $patientId;
@@ -64,7 +86,7 @@ class PouchCollectionDto extends Collection implements PouchCollection
     {
         foreach ($pouches as $pouch) {
             if (!$pouch instanceof Pouch) {
-                throw new \InvalidArgumentException('Only instances of Pouch can be added to PouchCollection.');
+                throw new InvalidInstanceOfCollectionException('Only instances of Pouch can be added to PouchCollection.');
             }
             parent::push($pouch);
         }
