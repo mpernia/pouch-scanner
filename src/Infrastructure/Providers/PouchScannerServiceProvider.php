@@ -52,8 +52,8 @@ class PouchScannerServiceProvider extends ServiceProvider
     public function provides(): array
     {
         return [
-            Contracts\Roll::class,
-            'ROLL',
+            PouchScanner::class,
+            'PouchScanner',
         ];
     }
 }

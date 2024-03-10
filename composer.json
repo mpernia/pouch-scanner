@@ -18,8 +18,8 @@
         }
     },
     "require": {
-        "php": "^8.1",
-        "laravel/framework": "^9.0",
+        "php": "^8.1 || ^8.2",
+        "laravel/framework": "^9.0 || ^10",
         "guzzlehttp/guzzle": "^7.8",
         "ext-simplexml": "*"
     },
@@ -37,8 +37,11 @@
                 "PouchScanner": "PouchScanner\\Infrastructure\\Facades\\PouchScanner"
             },
             "branch-alias": {
-                "dev-master": "1.0-dev"
+                "dev-master": "1.0.2"
             }
         }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit"
     }
 }

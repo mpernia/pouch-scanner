@@ -4,17 +4,40 @@ namespace PouchScanner\Domain\Contracts;
 
 interface Roll
 {
+    /**
+     * @return string|null
+     */
     public function getPatientRoll(): ?string;
 
+    /**
+     * @return string|null
+     */
     public function getBatchId(): ?string;
-    
+
+    /**
+     * @return string|null
+     */
     public function getPatientId(): ?string;
 
-    public function getPouches(): ?PouchCollection;
+    /**
+     * @return PouchCollection
+     */
+    public function getPouches(): PouchCollection;
 
-    public function setPouches(?PouchCollection $pouches): Roll:
-    
+    /**
+     * @param PouchCollection $pouches
+     * @return Roll
+     */
+    public function setPouches(PouchCollection $pouches): Roll;
+
+    /**
+     * @return string
+     */
     public function getStatus(): string;
-    
-    public function setStatus(string $status): Roll
+
+    /**
+     * @param string $status
+     * @return Roll
+     */
+    public function setStatus(string $status): Roll;
 }
