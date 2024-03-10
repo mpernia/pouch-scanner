@@ -5,6 +5,7 @@ namespace PouchScanner\Application\DataTransferObjects;
 use PouchScanner\Domain\Contracts\Pill;
 use PouchScanner\Domain\Contracts\PillCollection;
 use PouchScanner\Domain\Contracts\Pouch;
+use PouchScanner\Domain\Exceptions\InvalidInstanceOfCollectionException;
 use Illuminate\Support\Collection;
 
 class PillCollectionDto extends Collection implements PillCollection
@@ -25,7 +26,7 @@ class PillCollectionDto extends Collection implements PillCollection
     {
         foreach ($pills as $pill) {
             if (!$pill instanceof Pill) {
-                throw new \InvalidArgumentException('Only instances of Pouch can be added to PouchCollection.');
+                throw new InvalidInstanceOfCollectionException('Only instances of Pouch can be added to PouchCollection.');
             }
             parent::push($pill);
         }

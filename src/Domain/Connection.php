@@ -21,26 +21,41 @@ class Connection
     {
     }
 
+    /**
+     * @return string
+     */
     public function getHostname(): string
     {
         return $this->hostname;
     }
 
+    /**
+     * @return string
+     */
     public function getUsername(): string
     {
         return $this->username;
     }
 
+    /**
+     * @return string
+     */
     public function getPassword(): string
     {
         return $this->password;
     }
 
+    /**
+     * @return string
+     */
     public function getProtocol(): string
     {
         return $this->protocol;
     }
 
+    /**
+     * @return int
+     */
     public function getPort(): int
     {
         return $this->port;
