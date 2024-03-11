@@ -1,46 +1,19 @@
-name: PouchScanner Release
+name: PHP Composer
 
 on:
   push:
-    branches:
-      - main
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
 
 jobs:
-  release:
+  build:
+
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        php: [7.4, 8.0]
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Cache
-        uses: actions/cache@v3
-
-      - name: Set up PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php }}
-          extensions: mbstring, zip, simplexml
-
-      - name: Install Composer dependencies
-        run: composer install
-
-      - name: Run tests
-        run: vendor/bin/phpunit
-
-      - name: Set up Node.js
-        with:
-          node-version: '14'
-
-
-      - name: Install Node dependencies
-        run: npm install
-
-      - name: Run semantic-release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npx semantic-release
+      - name: Git Semantic Version
+        uses: PaulHatch/semantic-version@v5.4.0
