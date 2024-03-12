@@ -4,7 +4,6 @@ namespace PouchScanner\Application\DataTransferObjects;
 
 use PouchScanner\Domain\Contracts\Pill;
 use PouchScanner\Domain\Contracts\PillCollection;
-use PouchScanner\Domain\Contracts\Pouch;
 use PouchScanner\Domain\Exceptions\InvalidInstanceOfCollectionException;
 use Illuminate\Support\Collection;
 
@@ -13,7 +12,7 @@ class PillCollectionDto extends Collection implements PillCollection
     /**
      * @param Pill[] $pills
      */
-    public function __construct($pills = [])
+    public function __construct(array $pills = [])
     {
         parent::__construct($pills);
     }
@@ -21,6 +20,7 @@ class PillCollectionDto extends Collection implements PillCollection
     /**
      * @param Pill ...$pills
      * @return void
+     * @throws InvalidInstanceOfCollectionException
      */
     public function push(...$pills): void
     {

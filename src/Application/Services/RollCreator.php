@@ -6,6 +6,7 @@ use PouchScanner\Application\DataTransferObjects\RollCollectionDto;
 use PouchScanner\Application\DataTransferObjects\RollDto;
 use PouchScanner\Domain\Contracts\PouchCollection;
 use PouchScanner\Domain\Contracts\RollCollection;
+use PouchScanner\Domain\Exceptions\InvalidInstanceOfCollectionException;
 use PouchScanner\Domain\RollStatus;
 
 /**
@@ -23,6 +24,7 @@ class RollCreator
      * @param array $data
      * @param RollStatus $status
      * @return RollCollection
+     * @throws InvalidInstanceOfCollectionException
      */
     public function __invoke(array $data, RollStatus $status): RollCollection
     {

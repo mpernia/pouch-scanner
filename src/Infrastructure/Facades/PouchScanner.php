@@ -2,6 +2,7 @@
 
 namespace PouchScanner\Infrastructure\Facades;
 
+use DateTime;
 use Illuminate\Support\Facades\Facade;
 use PouchScanner\Domain\Connection;
 use PouchScanner\Domain\Contracts\Pill;
@@ -22,7 +23,7 @@ use PouchScanner\Domain\StorageSetting;
  * @method static PouchCollection pouchCollection(Pouch...$pouchs)
  * @method static PillCollection pillCollection(Pill...$pills)
  * @method static RepairCollection repairCollection(Repair...$repairs)
- * @method static Roll roll(?string $patientRoll = null, ?string $batchId = null, ?string $patientId = null, string $status = RollStatus::NOT_INSPECTED->value, ?PouchCollection $pouches = null)
+ * @method static Roll roll(?string $patientRoll = null, ?string $batchId = null, ?string $patientId = null, ?string $status = null, ?PouchCollection $pouches = null)
  * @method static Pouch pouch(?string $pouchId = null, bool $secondValidation = false, ?string $secondValidationBy = null, ?string $checkedBy = null, ?DateTime $checkedDateTime = null, ?string $pouchImageUrl = null, ?string $productionBox = null, ?DateTime $doseTime = null, ?string $visionState = null, ?string $visionMessage = null, ?RepairCollection $repairs = null, ?PillCollection $pills = null)
  * @method static Repair repair(?string $comment = null, ?string $repair = null, ?string $user = null, ?DateTime $dateTime = null)
  * @method static Pill pill(?string $medicationId = null, ?int $amount = null, ?string $description = null, bool $detected = false, ?string $image = null)

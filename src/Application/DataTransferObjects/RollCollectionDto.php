@@ -13,6 +13,7 @@ class RollCollectionDto extends Collection implements RollCollection
     /**
      * @param Roll ...$rolls
      * @return void
+     * @throws InvalidInstanceOfCollectionException
      */
     public function push(...$rolls): void
     {

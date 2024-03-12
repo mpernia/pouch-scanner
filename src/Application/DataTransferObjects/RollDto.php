@@ -9,22 +9,24 @@ use PouchScanner\Domain\RollStatus;
 class RollDto implements Roll
 {
     private PouchCollection $pouches;
+    private ?string $status;
 
     /**
      * @param string|null $patientRoll
      * @param string|null $batchId
      * @param string|null $patientId
-     * @param string $status
+     * @param string|null $status
      * @param PouchCollection|null $pouches
      */
     public function __construct(
         private readonly ?string $patientRoll = null,
         private readonly ?string $batchId = null,
         private readonly ?string $patientId = null,
-        private string $status = RollStatus::NOT_INSPECTED->value,
+        ?string $status = null,
         ?PouchCollection $pouches = null
     )
     {
+        $this->status = $status ?? RollStatus::NOT_INSPECTED->value;
         $this->pouches = $pouches ?? new PouchCollectionDto;
     }
 

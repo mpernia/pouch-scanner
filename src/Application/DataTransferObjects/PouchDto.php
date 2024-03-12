@@ -10,7 +10,6 @@ use PouchScanner\Domain\Contracts\RepairCollection;
 class PouchDto implements Pouch
 {
     private RepairCollection $repairs;
-
     private PillCollection $pills;
 
 
@@ -43,8 +42,8 @@ class PouchDto implements Pouch
         ?PillCollection $pills = null
     )
     {
-        $this->repairs = $pouches ?? new RepairCollectionDto;
-        $this->pills = $pouches ?? new PillCollectionDto;
+        $this->repairs = $repairs ?? new RepairCollectionDto;
+        $this->pills = $pills ?? new PillCollectionDto;
     }
 
     /**
