@@ -3,12 +3,7 @@
 namespace PouchScanner\Application\Services;
 
 use DateTime;
-use PouchScanner\Application\DataTransferObjects\PillCollectionDto;
-use PouchScanner\Application\DataTransferObjects\PillDto;
-use PouchScanner\Application\DataTransferObjects\PouchCollectionDto;
-use PouchScanner\Application\DataTransferObjects\PouchDto;
-use PouchScanner\Application\DataTransferObjects\RepairCollectionDto;
-use PouchScanner\Application\DataTransferObjects\RepairDto;
+use Exception;
 use PouchScanner\Infrastructure\Facades\PouchScanner;
 use PouchScanner\Domain\Contracts\PillCollection;
 use PouchScanner\Domain\Contracts\PouchCollection;
@@ -40,7 +35,7 @@ class PouchCreator
     public function __invoke(array $data): PouchCollection
     {
         $pouches = $data['pouches']['pouch'];
-        $puchCollection = PouchScanner::pouchCollection();
+        $pouchCollection = PouchScanner::pouchCollection();
         foreach ($pouches as $pouch) {
             $repairs = count($pouch['repairs']) > 0 ? $this->getRepairCollection($pouch['repairs']) : null;
             $pills = count($pouch['pills']) > 0 ? $this->getPillCollection($pouch['pills']) : null;
@@ -58,9 +53,9 @@ class PouchCreator
                 repairs: $repairs,
                 pills: $pills
             );
-            $puchCollection->push($pouchDto);
+            $pouchCollection->push($pouchDto);
         }
-        return $puchCollection;
+        return $pouchCollection;
     }
 
     /**
@@ -75,7 +70,7 @@ class PouchCreator
     /**
      * @param array $data
      * @return RepairCollection
-     * @throws \Exception
+     * @throws Exception
      */
     private function getRepairCollection(array $data): RepairCollection
     {
@@ -83,10 +78,10 @@ class PouchCreator
         foreach ($data as $repair) {
             $repairCollection->push(
                 PouchScanner::repair(
-                    comment: $data['repair']['comment'],
-                    repair: $data['repair']['repair'],
-                    user: $data['repair']['user'],
-                    dateTime: is_string($data['repair']['dateTime']) ? new DateTime($data['repair']['dateTime']) : null,
+                    comment: $repair['comment'],
+                    repair: $repair['repair'],
+                    user: $repair['user'],
+                    dateTime: is_string($repair['dateTime']) ? new DateTime($repair['dateTime']) : null,
                 )
             );
         }

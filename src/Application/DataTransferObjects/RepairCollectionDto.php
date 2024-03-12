@@ -12,7 +12,7 @@ class RepairCollectionDto extends Collection implements RepairCollection
     /**
      * @param Repair[] $repairs
      */
-    public function __construct($repairs = [])
+    public function __construct(array $repairs = [])
     {
         parent::__construct($repairs);
     }
@@ -20,6 +20,7 @@ class RepairCollectionDto extends Collection implements RepairCollection
     /**
      * @param Repair ...$repairs
      * @return void
+     * @throws InvalidInstanceOfCollectionException
      */
     public function push(...$repairs): void
     {

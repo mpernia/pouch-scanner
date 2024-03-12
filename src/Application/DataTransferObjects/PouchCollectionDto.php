@@ -81,6 +81,7 @@ class PouchCollectionDto extends Collection implements PouchCollection
     /**
      * @param Pouch ...$pouches
      * @return void
+     * @throws InvalidInstanceOfCollectionException
      */
     public function push(...$pouches): void
     {

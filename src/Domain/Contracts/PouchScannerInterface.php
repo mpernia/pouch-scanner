@@ -37,7 +37,7 @@ interface PouchScannerInterface
      * @param string|null $patientRoll
      * @param string|null $batchId
      * @param string|null $patientId
-     * @param string $status
+     * @param string|null $status
      * @param PouchCollection|null $pouches
      * @return Roll
      */
@@ -45,7 +45,7 @@ interface PouchScannerInterface
         ?string $patientRoll = null,
         ?string $batchId = null,
         ?string $patientId = null,
-        string $status = RollStatus::NOT_INSPECTED->value,
+        ?string $status = null,
         ?PouchCollection $pouches = null
     ): Roll;
 
@@ -113,8 +113,9 @@ interface PouchScannerInterface
 
     /**
      * another description here
-     * @param string $text
-     * @return void
+     * @param Connection|null $connection
+     * @param StorageSetting|null $storage
+     * @return PouchScannerInterface
      */
     public function configure(?Connection $connection = null, ?StorageSetting $storage = null): PouchScannerInterface;
 
@@ -125,21 +126,21 @@ interface PouchScannerInterface
 
     /**
      * @param int $daysBack
-     * @return mixed
+     * @return RollCollection
      */
-    public function getNotInspectedRolls(int $daysBack = 1);
+    public function getNotInspectedRolls(int $daysBack = 1): RollCollection;
 
     /**
      * @param int $daysBack
-     * @return mixed
+     * @return RollCollection
      */
-    public function getInProgressRolls(int $daysBack = 1);
+    public function getInProgressRolls(int $daysBack = 1): RollCollection;
 
     /**
      * @param int $daysBack
-     * @return mixed
+     * @return RollCollection
      */
-    public function getFinalizedRolls(int $daysBack = 1);
+    public function getFinalizedRolls(int $daysBack = 1): RollCollection;
 
     /**
      * @param int|string $rollId

@@ -23,8 +23,11 @@ use PouchScanner\Domain\Contracts\Repair;
 use PouchScanner\Domain\Contracts\RepairCollection;
 use PouchScanner\Domain\Contracts\Roll;
 use PouchScanner\Domain\Contracts\RollCollection;
+use PouchScanner\Domain\Exceptions\InvalidInstanceOfCollectionException;
 use PouchScanner\Domain\Exceptions\InvalidResponseException;
 use PouchScanner\Domain\Exceptions\FailedSaveFileException;
+use PouchScanner\Domain\Exceptions\FailedActionException;
+use PouchScanner\Domain\Exceptions\InvalidFileFormatException;
 use PouchScanner\Domain\RollStatus;
 use PouchScanner\Domain\StorageSetting;
 use DateTime;
@@ -39,21 +42,13 @@ use SimpleXMLElement;
 class PouchScanner implements PouchScannerInterface
 {
     private const PAYLOAD = '<?xml version="1.0" encoding="UTF-8"?><Content><Username>%s</Username><Password>%s</Password></Content>';
-
     private readonly RollCreator $rollCreator;
-
     private readonly PouchCreator $pouchCreator;
-
     private Client $client;
-
     private Connection $connection;
-
     private StorageSetting $storage;
-
     private XmlReader $xmlReader;
-
     private array $headers;
-
     private array $images = [];
 
     public function __construct()
@@ -68,12 +63,13 @@ class PouchScanner implements PouchScannerInterface
     /**
      * @param Roll ...$rolls
      * @return RollCollection
+     * @throws InvalidInstanceOfCollectionException
      */
     public function rollCollection(...$rolls): RollCollection
     {
         $rollCollection = new RollCollectionDto;
-        if ($rolls instanceof Roll) {
-            $rollCollection->push($rolls);
+        if (count($rolls) > 0){
+            $rollCollection->push(...$rolls);
         }
         return  $rollCollection;
     }
@@ -81,12 +77,13 @@ class PouchScanner implements PouchScannerInterface
     /**
      * @param Pouch ...$pouches
      * @return PouchCollection
+     * @throws InvalidInstanceOfCollectionException
      */
     public function pouchCollection(...$pouches): PouchCollection
     {
         $pouchCollection = new PouchCollectionDto;
         if (count($pouches) > 0){
-            $pouchCollection->push($pouches);
+            $pouchCollection->push(...$pouches);
         }
         return  $pouchCollection;
     }
@@ -94,12 +91,13 @@ class PouchScanner implements PouchScannerInterface
     /**
      * @param Pill ...$pills
      * @return PillCollection
+     * @throws InvalidInstanceOfCollectionException
      */
     public function pillCollection(...$pills): PillCollection
     {
         $pillCollection = new PillCollectionDto;
         if (count($pills) > 0) {
-            $pillCollection->push($pills);
+            $pillCollection->push(...$pills);
         }
         return  $pillCollection;
     }
@@ -107,12 +105,13 @@ class PouchScanner implements PouchScannerInterface
     /**
      * @param Repair ...$repairs
      * @return RepairCollection
+     * @throws InvalidInstanceOfCollectionException
      */
     public function repairCollection(...$repairs): RepairCollection
     {
         $repairCollection = new RepairCollectionDto;
         if (count($repairs) > 0) {
-            $repairCollection->push($repairs);
+            $repairCollection->push(...$repairs);
         }
         return  $repairCollection;
     }
@@ -121,7 +120,7 @@ class PouchScanner implements PouchScannerInterface
      * @param string|null $patientRoll
      * @param string|null $batchId
      * @param string|null $patientId
-     * @param string $status
+     * @param string|null $status
      * @param PouchCollection|null $pouches
      * @return Roll
      */
@@ -129,7 +128,7 @@ class PouchScanner implements PouchScannerInterface
         ?string $patientRoll = null,
         ?string $batchId = null,
         ?string $patientId = null,
-        string $status = RollStatus::NOT_INSPECTED->value,
+        ?string $status = null,
         ?PouchCollection $pouches = null
     ): Roll
     {
@@ -137,7 +136,7 @@ class PouchScanner implements PouchScannerInterface
             patientRoll: $patientRoll,
             batchId: $batchId,
             patientId: $patientId,
-            status: $status,
+            status: $status ?? RollStatus::NOT_INSPECTED->value,
             pouches: $pouches
         );
     }
@@ -265,8 +264,9 @@ class PouchScanner implements PouchScannerInterface
     /**
      * @return PouchScannerInterface
      * @throws GuzzleException
-     * @throws \PouchScanner\Domain\Exceptions\FailedActionException
-     * @throws \PouchScanner\Domain\Exceptions\InvalidFileFormatException
+     * @throws FailedActionException
+     * @throws InvalidFileFormatException
+     * @throws InvalidResponseException
      */
     public function login(): PouchScannerInterface
     {
@@ -282,8 +282,10 @@ class PouchScanner implements PouchScannerInterface
      * @return RollCollection
      * @throws FailedSaveFileException
      * @throws GuzzleException
-     * @throws \PouchScanner\Domain\Exceptions\FailedActionException
-     * @throws \PouchScanner\Domain\Exceptions\InvalidFileFormatException
+     * @throws FailedActionException
+     * @throws InvalidFileFormatException
+     * @throws InvalidResponseException
+     * @throws InvalidInstanceOfCollectionException
      */
     public function getNotInspectedRolls(int $daysBack = 1): RollCollection
     {
@@ -300,8 +302,10 @@ class PouchScanner implements PouchScannerInterface
      * @return RollCollection
      * @throws FailedSaveFileException
      * @throws GuzzleException
-     * @throws \PouchScanner\Domain\Exceptions\FailedActionException
-     * @throws \PouchScanner\Domain\Exceptions\InvalidFileFormatException
+     * @throws FailedActionException
+     * @throws InvalidFileFormatException
+     * @throws InvalidResponseException
+     * @throws InvalidInstanceOfCollectionException
      */
     public function getInProgressRolls(int $daysBack = 1): RollCollection
     {
@@ -318,8 +322,10 @@ class PouchScanner implements PouchScannerInterface
      * @return RollCollection
      * @throws FailedSaveFileException
      * @throws GuzzleException
-     * @throws \PouchScanner\Domain\Exceptions\FailedActionException
-     * @throws \PouchScanner\Domain\Exceptions\InvalidFileFormatException
+     * @throws FailedActionException
+     * @throws InvalidFileFormatException
+     * @throws InvalidResponseException
+     * @throws InvalidInstanceOfCollectionException
      */
     public function getFinalizedRolls(int $daysBack = 1): RollCollection
     {
@@ -336,8 +342,10 @@ class PouchScanner implements PouchScannerInterface
      * @return Roll
      * @throws FailedSaveFileException
      * @throws GuzzleException
-     * @throws \PouchScanner\Domain\Exceptions\FailedActionException
-     * @throws \PouchScanner\Domain\Exceptions\InvalidFileFormatException
+     * @throws FailedActionException
+     * @throws InvalidFileFormatException
+     * @throws InvalidResponseException
+     * @throws Exception
      */
     public function getRoll(int|string $rollId): Roll
     {
@@ -349,8 +357,8 @@ class PouchScanner implements PouchScannerInterface
             patientRoll: $rollId,
             batchId: $attributes->batchId,
             patientId: $attributes->patientId,
-            pouches: $this->pouchCreator->__invoke($arrayContent),
-            status: RollStatus::FINALIZED->value
+            status: RollStatus::FINALIZED->value,
+            pouches: $this->pouchCreator->__invoke($arrayContent)
         );
         return $roll->setPouches(
             $this->saveImageIfConfigured($roll->getPouches())
@@ -381,6 +389,7 @@ class PouchScanner implements PouchScannerInterface
     /**
      * @param PouchCollection|null $pouches
      * @return PouchCollection|null
+     * @throws InvalidInstanceOfCollectionException
      */
     private function saveImageIfConfigured(?PouchCollection $pouches): ?PouchCollection
     {
@@ -408,7 +417,9 @@ class PouchScanner implements PouchScannerInterface
         return null;
     }
 
-    /** @throws GuzzleException */
+    /** @throws GuzzleException
+     * @throws InvalidResponseException
+     */
     private function sendRequest(string $uri, ?string $method = null, string $body = ''): string
     {
         $method = is_null($method) ? config('pouch-scanner.http.verb') : $method;
@@ -422,10 +433,10 @@ class PouchScanner implements PouchScannerInterface
     }
 
     /**
-     * @param $uri
+     * @param string $uri
      * @return string
      */
-    private function url($uri = ''): string
+    private function url(string $uri = ''): string
     {
         $port = !in_array($this->connection->getPort(), [80, 443]) ? ':' . $this->connection->getPort() : '';
         $protocol  = $this->connection->getProtocol();

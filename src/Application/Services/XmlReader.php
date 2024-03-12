@@ -13,9 +13,6 @@ use PouchScanner\Domain\Exceptions\FailedActionException;
  */
 class XmlReader
 {
-    /**
-     * @var array
-     */
     protected array $xmlArrayContent = [];
 
     /**
