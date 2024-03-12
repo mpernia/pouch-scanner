@@ -3,46 +3,29 @@
 namespace PouchScanner\Application\Services;
 
 use DateTime;
-use Exception;
-use PouchScanner\Infrastructure\Facades\PouchScanner;
+use PouchScanner\Application\DataTransferObjects\PillCollectionDto;
+use PouchScanner\Application\DataTransferObjects\PillDto;
+use PouchScanner\Application\DataTransferObjects\PouchCollectionDto;
+use PouchScanner\Application\DataTransferObjects\PouchDto;
+use PouchScanner\Application\DataTransferObjects\RepairCollectionDto;
+use PouchScanner\Application\DataTransferObjects\RepairDto;
 use PouchScanner\Domain\Contracts\PillCollection;
 use PouchScanner\Domain\Contracts\PouchCollection;
 use PouchScanner\Domain\Contracts\RepairCollection;
-
-/**
- * Use this class to create a collection of Pouches.
- * The structure of the one Pouch is:
- * @property  string|null $pouchId
- * @property bool $secondValidation
- * @property string|null $secondValidationBy
- * @property string|null $checkedBy
- * @property DateTime|null $checkedDateTime
- * @property string|null $pouchImageUrl
- * @property string|null $productionBox
- * @property DateTime|null $doseTime
- * @property string|null $visionState
- * @property string|null $visionMessage
- * @property RepairCollection|null $repairs
- * @property PillCollection|null $pills 
- */
+use Throwable;
 class PouchCreator
 {
-    /**
-     * @param array $data
-     * @return PouchCollection
-     * @throws \Exception
-     */
     public function __invoke(array $data): PouchCollection
     {
-        $pouches = $data['pouches']['pouch'];
-        $pouchCollection = PouchScanner::pouchCollection();
+        $pouches = $data['data']['patientRoll']['pouch'];
+        $puchCollection = new PouchCollectionDto();
         foreach ($pouches as $pouch) {
-            $repairs = count($pouch['repairs']) > 0 ? $this->getRepairCollection($pouch['repairs']) : null;
+            $repairs = is_countable($pouch['repairs']) && count($pouch['repairs']) > 0 ? $this->getRepairCollection($pouch['repairs']) : null;
             $pills = count($pouch['pills']) > 0 ? $this->getPillCollection($pouch['pills']) : null;
-            $pouchDto = PouchScanner::pouch(
+            $pouchDto = new PouchDto(
                 pouchId: $pouch['pouchId'],
                 secondValidation: $pouch['secondValidation'],
-                secondValidationBy:$pouch['secondValidationBy'],
+                secondValidationBy:!$pouch['secondValidationBy'] || $pouch['secondValidationBy'] == [] ?  null : $pouch['secondValidationBy'],
                 checkedBy: $pouch['checkedBy'],
                 checkedDateTime: is_string($pouch['checkedDateTime']) ? new DateTime($pouch['checkedDateTime']) : null,
                 pouchImageUrl: $pouch['pouchImageUrl'],
@@ -53,58 +36,66 @@ class PouchCreator
                 repairs: $repairs,
                 pills: $pills
             );
-            $pouchCollection->push($pouchDto);
+            $puchCollection->push($pouchDto);
         }
-        return $pouchCollection;
+        return $puchCollection;
     }
 
-    /**
-     * @param array $data
-     * @return object
-     */
-    public function attributes(array $data): object
+    public function attributes(array $data): ?object
     {
-        return (object)$data['pouches']['@attributes'];
+        if(isset($data['pouch'])){
+            return (object)$data['pouch'] ;
+        }else{
+            return null;
+        }
+
     }
 
-    /**
-     * @param array $data
-     * @return RepairCollection
-     * @throws Exception
-     */
     private function getRepairCollection(array $data): RepairCollection
     {
-        $repairCollection = PouchScanner::repairCollection();
+        $repairCollection = new RepairCollectionDto;
         foreach ($data as $repair) {
             $repairCollection->push(
-                PouchScanner::repair(
-                    comment: $repair['comment'],
-                    repair: $repair['repair'],
-                    user: $repair['user'],
-                    dateTime: is_string($repair['dateTime']) ? new DateTime($repair['dateTime']) : null,
+                new RepairDto(
+                    comment: $data['repair']['comment'],
+                    repair: $data['repair']['repair'],
+                    user: $data['repair']['user'],
+                    dateTime: is_string($data['repair']['dateTime']) ? new DateTime($data['repair']['dateTime']) : null,
                 )
             );
         }
         return $repairCollection;
     }
 
-    /**
-     * @param array $data
-     * @return PillCollection
-     */
     private function getPillCollection(array $data): PillCollection
-    {
-        $pillCollection = PouchScanner::pillCollection();
+    {//dd($data);
+        $pillCollection = new PillCollectionDto;
         foreach ($data as $pill) {
-            $pillCollection->push(
-                PouchScanner::pill(
-                    medicationId: $pill['medicationId'],
-                    amount: (int)$pill['amount'],
-                    description: $pill['description'],
-                    detected: (bool)$pill['detected'],
-                    image: is_string($pill['image'],) ? $pill['image'] : null
-                )
-            );
+            if(isset($pill['medicationId'])){//Bolsa tiene solo una pastilla
+                $pillCollection->push(
+                    new PillDto(
+                        medicationId: $pill['medicationId'],
+                        amount: (int)$pill['amount'],
+                        description: $pill['description'],
+                        detected: (bool)$pill['detected'],
+                        image: is_string($pill['image'],) ? $pill['image'] : null
+                    )
+                );
+            }else{//Bolsa tiene mas de una pastilla
+                foreach ($pill as $pillData){
+                    $pillCollection->push(
+                        new PillDto(
+                            medicationId: $pillData['medicationId'],
+                            amount: (int)$pillData['amount'],
+                            description: $pillData['description'],
+                            detected: (bool)$pillData['detected'],
+                            image: is_string($pillData['image'],) ? $pillData['image'] : null
+                        )
+                    );
+                }
+            }
+
+
         }
         return $pillCollection;
     }
