@@ -22,41 +22,26 @@ class StorageSetting
     {
     }
 
-    /**
-     * @return string|null
-     */
     public function getStorageDirectory(): ?string
     {
         return $this->storageDirectory ?? null;
     }
 
-    /**
-     * @return string|null
-     */
     public function getDownloadImageDirectory(): ?string
     {
         return $this->downloadImageDirectory ?? null;
     }
 
-    /**
-     * @return string|null
-     */
     public function getStorageDisk(): ?string
     {
         return $this->storageDisk ?? null;
     }
 
-    /**
-     * @return bool
-     */
     public function isStorageRequest(): bool
     {
         return $this->storageRequest;
     }
 
-    /**
-     * @return bool
-     */
     public function isDownloadImages(): bool
     {
         return $this->downloadImages;
