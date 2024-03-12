@@ -26,11 +26,12 @@ This repository is developed for Laravel Framework 9 or higher.
 
 ## Contents
 
+- [Contents](#contents)
 - [Installation](#installation)
-- [Dependencies](#dependencies)
 - [Configuration](#configuration)
-  - [Host Connection](#host-Connection)
+  - [Host connection](#host-connection)
   - [Storage settings](#storage-settings)
+  - [Publish files](#publish-files)
 - [Demo](#demo)
 
 ## Installation
@@ -46,11 +47,35 @@ This repository is developed for Laravel Framework 9 or higher.
 
 ## Configuration
 
+
+
 ### Host connection
+
+
+```php
+$connection = new Connection(
+    hostname: 'slim',
+    username: 'admin',
+    password: 'password',
+    protocol: 'http',
+    port: 8080
+);
+
+```
 
 
 ### Storage settings
 
+```php
+$settings = new StorageSetting(
+    storageDirectory:'roll-requests',
+    downloadImageDirectory: 'pouch-images',
+    storageDisk: 'local',
+    storageRequest: true,
+    downloadImages: true
+);
+
+```
 
 
 
